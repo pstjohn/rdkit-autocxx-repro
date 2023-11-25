@@ -18,7 +18,8 @@ jobs:
 
       - name: Install deps
         run : |
-          conda install rdkit clangdev boost-cpp
+          conda update conda
+          conda install python=3.12 rdkit clangdev boost-cpp
 
       - name: Build the project
         run: | 
