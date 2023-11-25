@@ -1,17 +1,26 @@
-const CPP_VERSION_FLAG: &'static str = "-std=c++20";
+const CPP_VERSION_FLAG: &'static str = "-std=c++17";
 
 fn main() -> miette::Result<()> {
-    let include_paths: Vec<_> = vec![
-        "/usr/local/include",
-        "/usr/local/include/rdkit",
-        "/usr/include",
-        "/usr/include/rdkit",
-        "/opt/homebrew/include/rdkit",
-        "/opt/homebrew/include",
-    ]
-    .into_iter()
-    .map(|x| std::path::PathBuf::from(x))
-    .collect();
+    let mut lib_paths = vec![];
+    let mut include_paths = vec![];
+
+    if let Ok(conda_prefix) = std::env::var("CONDA_PREFIX") {
+        include_paths.push(format!("{conda_prefix}/include"));
+        include_paths.push(format!("{conda_prefix}/include/rdkit"));
+        lib_paths.push(format!("{conda_prefix}/lib"));
+    }
+
+    // include_paths.push("/usr/include".to_string());
+    // include_paths.push("/usr/local/include".to_string());
+
+    let include_paths: Vec<std::path::PathBuf> = include_paths
+        .into_iter()
+        .map(std::path::PathBuf::from)
+        .collect();
+
+    for path in lib_paths {
+        println!("cargo:rustc-link-search=native={}", path);
+    }
 
     let mut builder = autocxx_build::Builder::new("src/main.rs", &include_paths)
         .extra_clang_args(&[CPP_VERSION_FLAG])
