@@ -14,14 +14,14 @@ jobs:
           installer-url: https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh
           allow-softlinks: true
           show-channel-urls: true
-          use-only-tar-bz2: true
 
       - name: Install deps
+        shell: bash -l {0}
         run : |
-          conda update conda
-          conda install python=3.12 rdkit clangdev boost-cpp
+          conda install rdkit clangdev boost-cpp
 
       - name: Build the project
+        shell: bash -l {0}      
         run: | 
           export LIBCLANG_PATH=$CONDA_PREFIX/lib
           cargo build
